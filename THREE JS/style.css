@@ -1,0 +1,354 @@
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #050505; 
+            font-family: 'Courier New', Courier, monospace; /* Font ala terminal/hacker */
+        }
+        canvas { 
+            display: block; 
+        }
+
+        /* --- TAMBAHAN BARU: CSS UNTUK UI --- */
+        #ui-layer {
+            position: absolute; /* Membuatnya melayang di atas 3D */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center; /* Posisi ke tengah horizontal */
+            align-items: center;     /* Posisi ke tengah vertikal */
+            
+            /* PENTING: Agar kamu tetap bisa memutar 3D pakai mouse di area yang kosong */
+            pointer-events: none; 
+        }
+
+        .terminal-box {
+            background-color: rgba(0, 10, 20, 0.7); /* Kaca transparan gelap */
+            border: 2px solid #00ffff; /* Garis Sian */
+            box-shadow: 0 0 15px #00ffff; /* Efek Glow/Neon */
+            border-radius: 10px;
+            padding: 30px;
+            color: #00ffff;
+            text-align: center;
+            
+            /* PENTING: Agar kotak ini bisa diklik/diketik */
+            pointer-events: auto; 
+            
+            /* Efek blur kaca di belakang kotak */
+            backdrop-filter: blur(5px); 
+        }
+
+        .terminal-box input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #00ffff;
+            color: white;
+            font-size: 16px;
+            padding: 5px;
+            margin-top: 15px;
+            outline: none;
+            width: 80%;
+            text-align: center;
+        }
+        #ui-layer {
+            transition: opacity 1.5s ease-out; /* Animasi untuk efek fade in/out */
+        }
+        .fade-out {
+            opacity: 0;
+        }
+
+        /* --- TEMA UI TELEPON --- */
+        #comms-layer {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            z-index: 10;
+        }
+        
+        .comms-box {
+            background: rgba(0, 15, 20, 0.8);
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 15px #00ffff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            color: #00ffff;
+            font-family: monospace;
+        }
+
+        /* Efek Teks Berkedip Merah */
+        .blink-text {
+            animation: blinker 1s linear infinite;
+            font-weight: bold;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+
+        /* Tombol Accept & Decline */
+        .button-group button {
+            background: transparent;
+            padding: 10px 15px;
+            margin: 15px 5px 0 5px;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        #accept-btn {
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            box-shadow: 0 0 5px #00ff00;
+        }
+        #accept-btn:hover { background: #00ff00; color: #000; }
+        
+        #decline-btn {
+            border: 1px solid #ff3333;
+            color: #ff3333;
+            box-shadow: 0 0 5px #ff3333;
+        }
+        #decline-btn:hover { background: #ff3333; color: #000; }
+
+        /* --- TEMA AI COMPANION --- */
+        #ai-companion {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background: rgba(0, 20, 30, 0.85);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            z-index: 20;
+            font-family: monospace;
+        }
+
+        .ai-avatar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 20px;
+            padding-right: 20px;
+            border-right: 1px solid rgba(0, 255, 255, 0.5);
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        /* Bola inti AI yang berdenyut */
+        .ai-core {
+            width: 30px;
+            height: 30px;
+            background: #00ffff;
+            border-radius: 50%;
+            margin-bottom: 5px;
+            box-shadow: 0 0 15px #00ffff;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        /* --- GAYA UNTUK GAMBAR AVATAR AI --- */
+        .ai-image-core {
+            width: 50px;         /* Sesuaikan ukuran lebarnya */
+            height: 50px;        /* Sesuaikan ukuran tingginya */
+            border-radius: 50%;  /* Membuat fotonya menjadi lingkaran sempurna */
+            border: 2px solid #00ffff;    /* Memberi garis tepi neon sian */
+            box-shadow: 0 0 15px #00ffff; /* Memberi efek cahaya glowing */
+            object-fit: cover;   /* Memastikan gambar tidak gepeng */
+            margin-bottom: 8px;
+            
+            /* (Opsional) Tetap pakai efek denyut agar terasa hidup */
+            animation: pulse 1.5s infinite alternate; 
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .ai-dialogue {
+            color: #ffffff;
+            font-size: 16px;
+            line-height: 1.5;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- TEMA UI NAVIGASI 4 JALUR --- */
+        #nav-layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Posisi persis di tengah layar */
+            z-index: 15;
+            width: 80%;
+            max-width: 600px;
+        }
+        
+        .nav-box {
+            background: rgba(0, 15, 20, 0.9);
+            border: 2px solid #00ffff; /* Warna kuning peringatan */
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            font-family: monospace;
+            color: #00ffff;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 Kolom */
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .nav-btn:hover {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 15px #00ffff;
+            transform: scale(1.05); /* Efek membesar saat di-hover */
+        }
+
+        /* --- GAYA RADAR KOKPIT --- */
+#radar-container {
+    position: absolute;
+    /* UBAH POSISI INI SESUAI KEBUTUHAN KOKPITMU */
+    top: 250px; 
+    left: 120px;
+    /* ---------------------------------------- */
+    width: 180px;
+    height: 180px;
+    background: rgba(0, 20, 10, 0.6); /* Latar belakang gelap transparan */
+    border: 3px solid #00ff00; /* Garis pinggir hijau neon */
+    border-radius: 50%; /* Membuatnya jadi bulat */
+    box-shadow: 0 0 15px #00ff00, inset 0 0 20px rgba(0, 255, 0, 0.3);
+    overflow: hidden;
+    z-index: 9000;
+    pointer-events: none; /* Agar tidak menghalangi klik */
+}
+
+/* Garis-garis lingkaran di dalam radar */
+.radar-grid {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    border-radius: 50%;
+    background-image: 
+        linear-gradient(0deg, transparent 49%, rgba(0, 255, 0, 0.3) 50%, transparent 51%),
+        linear-gradient(90deg, transparent 49%, rgba(0, 255, 0, 0.3) 50%, transparent 51%),
+        radial-gradient(transparent 65%, rgba(0, 255, 0, 0.4) 70%, transparent 71%);
+}
+
+/* Garis pemindai yang berputar */
+.radar-sweep {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    border-radius: 50%;
+    background-image: conic-gradient(from 0deg, rgba(0, 255, 0, 0.5) 0deg, transparent 60deg);
+    animation: radarSpin 4s linear infinite;
+    border-right: 2px solid rgba(0, 255, 0, 0.8);
+}
+
+@keyframes radarSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Titik (Blip) Musuh */
+.blip {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    display: none; /* Sembunyi default */
+}
+
+.blip.hostile {
+    background: red;
+    box-shadow: 0 0 10px red;
+    /* Posisi awal musuh (misal: datang dari arah jam 2) */
+    top: 25%; 
+    left: 75%;
+    animation: blipPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes blipPulse {
+    from { opacity: 0.4; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 20px red; }
+}
+
+/* --- EFEK GLITCH CYBER ATTACK --- */
+#glitch-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Agar tembus klik */
+    z-index: 9998; /* Di atas 3D, tapi di bawah UI Minigame */
+    opacity: 0; /* Standar: Sembunyi */
+    
+    /* Efek garis scanline halus */
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    mix-blend-mode: hard-light; /* Agar warnanya menyatu kasar dengan background 3D */
+}
+
+/* Kelas untuk memicu animasi */
+.glitching-active {
+    animation: digitalGlitch 0.2s infinite linear alternate-reverse;
+}
+
+/* Animasi kerusakan sinyal acak */
+@keyframes digitalGlitch {
+    0% {
+        opacity: 0.1;
+        transform: translate(0, 0);
+        filter: hue-rotate(0deg);
+    }
+    20% {
+        opacity: 0.8; /* Muncul tiba-tiba */
+        transform: translate(-5px, 2px); /* Geser kiri sedikit */
+        filter: hue-rotate(90deg) blur(1px); /* Putar warna jadi ungu/hijau & blur */
+        background-color: rgba(255, 0, 0, 0.1); /* Kilatan merah tipis */
+    }
+    40% {
+        opacity: 0.2;
+        transform: translate(5px, -2px); /* Geser kanan */
+        filter: hue-rotate(-90deg);
+    }
+    60% {
+        opacity: 0.9;
+        transform: translate(-2px, 5px) scale(1.02); /* Zoom sedikit */
+        background-color: rgba(0, 255, 255, 0.1); /* Kilatan biru cyan tipis */
+    }
+    80% {
+        opacity: 0;
+        transform: translate(0, 0);
+    }
+    100% {
+        opacity: 0.4;
+        transform: translate(2px, -2px);
+    }
+}

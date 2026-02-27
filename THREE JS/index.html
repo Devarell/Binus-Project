@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roket Game - 3D Engine</title>
+ 
+    <link rel="stylesheet" href="style.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="ui-layer">
+        <div class="terminal-box">
+            <h2>[ PILOT REGISTRATION ]</h2>
+            <p id="status-text">SYSTEM REBOOTING... PLEASE ENTER YOUR CREDENTIALS.</p>
+            
+            <input id="callsign-input" type="text" placeholder="Callsign / Nama..." autofocus style="margin-bottom: 10px;">
+            <br>
+            <input id="phone-input" type="tel" placeholder="No. Transmisi (Handphone)..." style="margin-bottom: 10px;">
+            <br>
+            <input id="school-input" type="text" placeholder="Origin Academy (Misal: SMAN 1 Bekasi)..." style="margin-bottom: 10px;">
+            <br>
+            <input id="major-input" type="text" placeholder="Division (Misal: IPA / RPL / TKJ)...">
+            
+            <p style="font-size: 12px; color: gray; margin-top: 15px;">*Lengkapi data manifes penerbangan lalu tekan ENTER</p>
+        </div>
+    </div>
+    <div id="flash-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; pointer-events: none; transition: opacity 1.5s ease-in-out; z-index: 9999;"></div>
+    <div id="comms-layer" style="display: none;">
+        <div class="comms-box">
+            <p class="blink-text" style="color: #ff3333;">[ INCOMING TRANSMISSION ]</p>
+            <h3>CALLER: COMMAND CENTER</h3>
+            
+            <div class="button-group">
+                <button id="accept-btn">ACCEPT</button>
+                <button id="decline-btn">DECLINE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-companion" style="display: none;">
+        <div class="ai-avatar">
+            <img src="assets/Avatar_AI.svg" alt="AI Avatar" class="ai-image-core">
+            
+            <span>A.I. SYS</span>
+        </div>
+        <div class="ai-dialogue">
+            <p id="ai-text"></p>
+        </div>
+    </div>
+
+    <div id="nav-layer" style="display: none;">
+        <div class="nav-box">
+            <h3 style="color: #00ffff; margin-bottom: 5px;">[ PERINGATAN SISTEM ]</h3>
+            <p style="margin-bottom: 20px; font-size: 14px;">Navigasi otomatis terganggu. Silakan pilih rute manual menuju Planet Asal.</p>
+            
+            <div class="nav-grid">
+                <button class="nav-btn" data-path="Alpha">Sektor Alpha (Jalur Cepat)</button>
+                <button class="nav-btn" data-path="Nebula">Gugusan Nebula (Area Stealth)</button>
+                <button class="nav-btn" data-path="Asteroid">Sabuk Asteroid (Medan Berat)</button>
+                <button class="nav-btn" data-path="Quantum">Gerbang Quantum (Portal AI)</button>
+            </div>
+        </div>
+    </div>
+
+<div id="qte-layer" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; text-align: left; color: #00ff00; font-family: 'Courier New', Courier, monospace; pointer-events: none; background: rgba(0, 15, 5, 0.95); padding: 30px; border: 2px solid #00ff00; border-radius: 8px; box-shadow: 0 0 40px rgba(0, 255, 0, 0.4); min-width: 500px;">
+        
+        <h3 style="color: #ff3333; margin-top: 0; animation: blinker 0.5s linear infinite;">> FATAL_EXCEPTION: MISSILE_LOCK_DETECTED</h3>
+        <p style="color: #aaaaaa; font-size: 16px; margin-bottom: 10px;">> Auto-evasion protocol FAILED.</p>
+        <p style="color: #aaaaaa; font-size: 16px; margin-bottom: 25px;">> Awaiting manual script execution. Append the correct flag to run:</p>
+        
+        <div style="font-size: 22px; color: white; margin-bottom: 20px;">
+            <span style="color: #00ccff;">root@devarell-ship</span>:<span style="color: #ffff00;">~</span>$ ./evade_protocol.sh -<span id="qte-key" style="color: #000; background: #00ff00; font-weight: bold; padding: 2px 10px; border-radius: 3px; animation: blinker 0.2s linear infinite;">X</span>
+        </div>
+        
+        <div style="width: 100%; height: 8px; background: rgba(255, 0, 0, 0.3); margin-top: 20px; border-radius: 4px; overflow: hidden;">
+            <div id="qte-timer" style="width: 100%; height: 100%; background: #ff3333;"></div>
+        </div>
+    </div>
+
+<div id="logic-layer" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; text-align: center; color: #00ff00; font-family: monospace; pointer-events: none; background: rgba(0, 20, 0, 0.9); padding: 30px; border: 2px solid #00ff00; border-radius: 10px; box-shadow: 0 0 30px #00ff00; min-width: 450px;">
+        <h2 style="color: #ff3333; animation: blinker 0.5s linear infinite; margin-bottom: 5px;">[ FIREWALL LOGIC GATEWAY ]</h2>
+        <p style="color: #aaaaaa; margin-bottom: 15px;">EVALUASI KODE INI SEKARANG:</p>
+        
+        <div style="font-size: 18px; color: #ffcc00; background: #222; padding: 10px; border-radius: 5px 5px 0 0; border: 1px solid #444; border-bottom: none; font-weight: bold; text-align: left;">
+            <span style="color: #ff5555;">if</span> <span id="logic-rule">( ... ) { BLOCK }</span>
+        </div>
+        
+        <div style="font-size: 24px; color: white; background: #050505; padding: 15px; border-radius: 0 0 5px 5px; border: 1px solid #444; margin-bottom: 25px; font-weight: bold; text-shadow: 0 0 5px white; text-align: left;">
+            <span style="color: #00ff00;">Data Masuk: </span> <br>
+            &gt; <span id="logic-data">...</span>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; padding: 0 20px;">
+            <span style="color: #00ccff; text-shadow: 0 0 10px #00ccff;">[ &larr; KIRI ] ALLOW</span>
+            <span style="color: #ff3333; text-shadow: 0 0 10px #ff3333;">BLOCK [ KANAN &rarr; ]</span>
+        </div>
+        
+        <div style="width: 100%; height: 10px; background: rgba(255, 0, 0, 0.3); margin-top: 25px; border-radius: 5px; overflow: hidden;">
+            <div id="logic-timer" style="width: 100%; height: 100%; background: #00ff00;"></div>
+        </div>
+    </div>
+    
+    <div id="glitch-overlay"></div>
+
+    <script type="module" src="index.js"></script>
+
+    <div id="radar-container" style="display: none;"> 
+        <div class="radar-grid"></div>
+        <div class="radar-sweep"></div>
+        <div id="enemy-blip" class="blip hostile"></div>
+    </div>
+
+    <div id="array-layer" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; text-align: center; color: #00ff00; font-family: monospace; pointer-events: none; background: rgba(10, 5, 0, 0.95); padding: 30px; border: 2px solid #ff8800; border-radius: 10px; box-shadow: 0 0 30px #ff8800; min-width: 500px;">
+        <h2 style="color: #ffaa00; animation: blinker 0.5s linear infinite; margin-bottom: 5px;">[ COLLISION IMMINENT ]</h2>
+        <p style="color: #aaaaaa; margin-bottom: 15px;">MENCARI CELAH KOSONG PADA ARRAY SABUK ASTEROID...</p>
+        
+        <div style="font-size: 26px; color: white; background: #050505; padding: 20px; border-radius: 5px; border: 1px solid #444; margin-bottom: 25px; font-weight: bold; text-shadow: 0 0 5px white; text-align: center; letter-spacing: 2px;">
+            <span style="color: #00ccff;">let</span> path = <br>
+            <span id="array-data" style="color: #ffcc00; font-size: 32px; display: block; margin-top: 10px;">["🪨", "NULL", "🪨", "🪨"]</span>
+        </div>
+        
+        <div style="font-size: 16px; font-weight: bold; padding: 0 20px; color: #fff;">
+            Ketik angka <span style="color: #00ff00; font-size: 20px;">[ INDEKS ]</span> di keyboard untuk menghindar!
+        </div>
+        
+        <div style="width: 100%; height: 10px; background: rgba(255, 0, 0, 0.3); margin-top: 25px; border-radius: 5px; overflow: hidden;">
+            <div id="array-timer" style="width: 100%; height: 100%; background: #ffaa00;"></div>
+        </div>
+    </div>
+
+    <div id="bitwise-layer" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; text-align: center; color: #00ffcc; font-family: 'Courier New', monospace; pointer-events: none; background: rgba(0, 10, 20, 0.95); padding: 30px; border: 2px solid #00ffcc; border-radius: 8px; box-shadow: 0 0 40px #00ffcc; min-width: 450px;">
+        
+        <h2 style="color: #ffffff; animation: blinker 0.2s linear infinite; margin-bottom: 5px; letter-spacing: 2px;">[ QUANTUM CORE OVERLOAD ]</h2>
+        <p style="color: #aaaaaa; margin-bottom: 15px;">MANUAL BITWISE OVERRIDE REQUIRED:</p>
+        
+        <div style="font-size: 40px; color: white; background: #000; padding: 20px; border: 1px solid #00ffcc; margin-bottom: 25px; font-weight: bold; text-shadow: 0 0 10px #00ffcc; letter-spacing: 5px;">
+            <span id="bitwise-op">1 AND 0</span>
+        </div>
+        
+        <div style="font-size: 18px; font-weight: bold; color: #fff;">
+            INPUT: Tekan <span style="color: #ff00ff; text-shadow: 0 0 5px #ff00ff;">[ 1 ]</span> atau <span style="color: #ff00ff; text-shadow: 0 0 5px #ff00ff;">[ 0 ]</span>
+        </div>
+        
+        <div style="width: 100%; height: 8px; background: rgba(0, 255, 204, 0.2); margin-top: 20px; overflow: hidden; border-radius: 4px;">
+            <div id="bitwise-timer" style="width: 100%; height: 100%; background: #00ffcc;"></div>
+        </div>
+    </div>
+
+    <div id="mission-success-layer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: rgba(0, 20, 15, 0.95); flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; font-family: 'Courier New', Courier, monospace;">
+        
+        <h1 style="color: #00ffcc; font-size: 80px; margin-bottom: 10px; text-shadow: 0 0 20px #00ffcc; letter-spacing: 10px;">MISSION ACCOMPLISHED</h1>
+        
+        <div style="width: 50%; height: 2px; background: #00ffcc; margin-bottom: 30px; box-shadow: 0 0 10px #00ffcc;"></div>
+        
+        <p id="success-message" style="font-size: 24px; color: #aaaaaa; margin-bottom: 50px; max-width: 600px; line-height: 1.5;">
+            Ancaman berhasil dinetralisir. Kapal kembali ke jalur aman.
+        </p>
+        
+        <button onclick="window.location.href='index.html'" style="padding: 15px 40px; font-size: 20px; font-weight: bold; color: #000; background-color: #00ffcc; border: none; border-radius: 5px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px #00ffcc; transition: all 0.3s ease;">
+            [ RETURN TO ACADEMY ]
+        </button>
+    </div>
+
+    <div id="game-over-layer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: rgba(20, 0, 0, 0.95); flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; font-family: 'Courier New', Courier, monospace;">
+        
+        <h1 style="color: #ff0000; font-size: 80px; margin-bottom: 10px; text-shadow: 0 0 20px #ff0000; letter-spacing: 10px;">MISSION FAILED</h1>
+        
+        <div style="width: 50%; height: 2px; background: #ff0000; margin-bottom: 30px; box-shadow: 0 0 10px #ff0000;"></div>
+        
+        <p id="death-message" style="font-size: 24px; color: #aaaaaa; margin-bottom: 50px; max-width: 600px; line-height: 1.5;">
+            Sistem gagal merespons. Kapal hancur berkeping-keping di luasnya ruang angkasa.
+        </p>
+        
+        <button onclick="window.location.href='index.html'" style="padding: 15px 40px; font-size: 20px; font-weight: bold; color: #000; background-color: #ff0000; border: none; border-radius: 5px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 15px #ff0000; transition: all 0.3s ease;">
+            [ RETURN TO BASE ]
+        </button>
+    </div>
+</body>
+</html>
