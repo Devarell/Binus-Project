@@ -157,20 +157,27 @@ function animate() {
     // --- ANIMASI SABUK ASTEROID ---
     if (sabukAsteroid.visible) {
         sabukAsteroid.children.forEach(batu => {
-            // 1. Batu melesat mendekat (dikalikan kecepatan kapal agar realistis)
+            // 1. Batu melesat mendekat
             batu.position.z += gamestate.kecepatanWarp * 1; 
 
-            // 2. Batu berputar bebas di ruang angkasa
+            // 2. Batu berputar bebas
             batu.rotation.x += batu.userData.rotSpeedX;
             batu.rotation.y += batu.userData.rotSpeedY;
             batu.rotation.z += batu.userData.rotSpeedZ;
 
             // 3. Efek Daur Ulang (Ilusi Tanpa Batas)
-            // Jika batu sudah lewat menembus kamera (Z positif), lempar lagi jauh ke depan!
-            if (batu.position.z > 20) {
-                batu.position.z = 17;
-                batu.position.x = (Math.random() - 0.5) * 200;
-                batu.position.y = (Math.random() - 0.5) * 100;
+            if (batu.position.z > 100) {
+                // LEMPAR KEMBALI JAUH KE DEPAN (MINUS), BUKAN 19!
+                batu.position.z = -200 - (Math.random() * 400); // Semakin minus, semakin jauh munculnya dari depan kaca
+                
+                // Gunakan Rumus Donat lagi agar saat respawn tidak menabrak lambung/kaca
+                const radiusAman = 80; // Samakan angkanya dengan yang di environments.js
+                const radiusMaksimal = 350;
+                const radius = radiusAman + Math.random() * (radiusMaksimal - radiusAman);
+                const sudut = Math.random() * Math.PI * 2;
+
+                batu.position.x = Math.cos(sudut) * radius;
+                batu.position.y = Math.sin(sudut) * radius;
             }
         });
     }

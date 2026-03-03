@@ -96,7 +96,7 @@ const kabutNebula = new THREE.FogExp2(0x1a053a, 0);
 // --- EFEK SABUK ASTEROID (LOW-POLY) ---
 // ==========================================
 const sabukAsteroid = new THREE.Group();
-const jumlahBatu = 80; // Jumlah batu yang meramaikan layar
+const jumlahBatu = 100; // Jumlah batu yang meramaikan layar
 
 // Gunakan bentuk Dodecahedron (12 sisi) dengan detail 0 agar terlihat kotak-kotak/kasar
 const batuGeometry = new THREE.DodecahedronGeometry(1, 0); 
@@ -114,8 +114,8 @@ for (let i = 0; i < jumlahBatu; i++) {
     const skala = Math.random() * 5 + 1; 
     batu.scale.set(skala, skala, skala);
 
-    const radiusAman =100; // Jarak minimal dari tengah layar (Besarkan angkanya jika masih menabrak lambung/kaca)
-    const radiusMaksimal = 200; // Jarak maksimal sebaran batu
+    const radiusAman = 80; // Jarak minimal dari tengah layar (Besarkan angkanya jika masih menabrak lambung/kaca)
+    const radiusMaksimal = 350; // Jarak maksimal sebaran batu
     
     // Acak jarak dan sudut (membuat bentuk donat)
     const radius = radiusAman + Math.random() * (radiusMaksimal - radiusAman);
@@ -123,7 +123,7 @@ for (let i = 0; i < jumlahBatu; i++) {
 
     batu.position.x = Math.cos(sudut) * radius;
     batu.position.y = Math.sin(sudut) * radius;
-    batu.position.z = (Math.random() * 500);
+    batu.position.z = (Math.random() * -400);// Sebar di depan dan belakang sedikit
 
     // 3. Acak Rotasi Awal
     batu.rotation.x = Math.random() * Math.PI;
@@ -131,9 +131,9 @@ for (let i = 0; i < jumlahBatu; i++) {
 
     // 4. Simpan Kecepatan Putar Unik untuk setiap batu (agar tidak seragam)
     batu.userData = {
-        rotSpeedX: (Math.random() - 0.5) * 0.05,
-        rotSpeedY: (Math.random() - 0.5) * 0.05,
-        rotSpeedZ: (Math.random() - 0.5) * 0.05
+        rotSpeedX: (Math.random() - 0.5) * 0.01,
+        rotSpeedY: (Math.random() - 0.5) * 0.01,
+        rotSpeedZ: (Math.random() - 0.5) * 0.01
     };
 
     sabukAsteroid.add(batu);
