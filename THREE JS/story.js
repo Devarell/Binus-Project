@@ -5,12 +5,6 @@ import { ambientLight, directionalLight, interiorLight } from './lighting.js';
 import { starMaterial, garisWarpMaterial, planetGroup, kabutNebula, sabukAsteroid, gridGroup} from './environments.js';
 import { bgm, sfxAlarm, sfxQTEcorrect, sfxQTEwrong, sfxLaser, sfxWarp, sfxVehicleDestroyed, sfxGlitch, suspenseBgm } from './audio.js';
 import { aktifkanRadar, matikanRadar, munculkanMusuh, hilangkanMusuh } from './radar.js';
-import { mulaiQTE } from './minigame1.js';
-import { mulaiLogicMinigame } from './minigame2.js';
-import { mulaiArrayMinigame } from './minigame3.js';
-import { mulaiBitwiseMinigame } from './minigames4.js';
-import { tampilkanGameOver } from './gameover.js';
-import { tampilkanMissionSuccess } from './gamewin.js';   
 
 // --- NASKAH RUTE ALPHA ---
 export function jalankanCeritaAlpha() {
@@ -62,59 +56,11 @@ export function jalankanCeritaAlpha() {
 
 
 setTimeout(() => {
-                sfxLaser.play(); // Nyalakan suara laser saat musuh muncul
                 triggerAI("AWAS! Radar mendeteksi misil pengejar dari faksi pemberontak! Lakukan manuver menghindar sekarang!", 9000);
                 
                 //suspenseBgm.play(); // Ganti BGM ke musik yang lebih tegang saat serangan dimulai
-                sfxAlarm.play(); // Nyalakan sirine!
-                gamestate.isAlarmActive = true;
-                gamestate.isShaking = true; // Layar bergetar!
-
-                munculkanMusuh(); // Tampilkan titik merah di radar sebagai indikasi musuh mendekat
 
                 // Tunggu AI selesai bicara (3 detik), lalu mulai QTE
-                setTimeout(() => {
-                    
-                    // PANGGIL MESIN QTE
-                    mulaiQTE(
-                        // --- JIKA PEMAIN BERHASIL (SUCCESS) ---
-                        () => {
-                            //suspenseBgm.pause(); // Matikan musik tegang
-                            sfxLaser.pause(); // Matikan suara laser
-                            sfxAlarm.pause();
-                            sfxQTEcorrect.play();
-                            gamestate.isAlarmActive = false;
-                            gamestate.isShaking = false;
-
-                            hilangkanMusuh(); // Hilangkan titik merah di radar karena musuh sudah berhasil dihindari
-                            
-                            // (Opsional) Tambahkan sfx melesat (sfxWarp.play()) di sini
-                            triggerAI("Manuver luar biasa! Misil musuh meledak di belakang kita. Kita aman, Komandan.", 11000);
-                            setTimeout(() => {
-                                tampilkanMissionSuccess("STATUS: CLEAR. Refleks terminal Anda berhasil menyelamatkan kapal dari kehancuran total.");
-                            }, 5000);
-                        },
-                        
-                        // --- JIKA PEMAIN GAGAL / TELAT (FAIL) ---
-                        () => {
-                            sfxLaser.pause(); // Matikan suara laser
-                            sfxQTEwrong.play(); // Mainkan suara salah saat QTE gagal
-                            gamestate.isShaking = true; // Getaran makin brutal
-                            
-                            // Lampu kabin padam jadi merah gelap
-                            ambientLight.color.setHex(0xff0000); 
-                            interiorLight.color.setHex(0xff0000);
-                            
-                            // (Opsional) Tambahkan suara ledakan besar di sini
-                            triggerAI("PERINGATAN KRITIS! Lambung kapal terkena benturan! Sistem perisai bocor! Evakuasi segera!", 9000);
-                            setTimeout(() => {
-                                tampilkanGameOver("Sistem tertembus misil musuh akibat kegagalan eksekusi skrip terminal.");
-                            }, 4000);
-                            //sfxVehicleDestroyed.play(); // Mainkan suara kapal meledak saat QTE gagal
-                        }
-                    );
-
-                }, 8000); // Jeda sebelum huruf QTE muncul
 
             }, 3000); // Jeda santai sebelum musuh menyerang
 
@@ -127,8 +73,6 @@ setTimeout(() => {
 // --- NASKAH RUTE NEBULA ---
 export function jalankanCeritaNebula() {
     bgm.pause(); 
-    sfxAlarm.pause(); 
-    sfxWarp.play();
     
     gamestate.isAlarmActive = false;
     gamestate.isShaking = false; 
@@ -174,43 +118,6 @@ export function jalankanCeritaNebula() {
         setTimeout(() => {
             glitchOverlay.classList.remove('glitching-active');
             sfxAlarm.pause(); // Matikan alarm sebelum minigame dimulai
-            mulaiLogicMinigame(
-                // --- JIKA PEMAIN MENANG (Bertahan 3 Ronde) ---
-                () => {
-                    suspenseBgm.pause(); // Matikan musik tegang setelah menang
-                    interiorLight.color.setHex(0x00ffff); // Lampu kembali biru cerah/aman
-                    interiorLight.intensity = 2;
-                    directionalLight.intensity = 1;
-                    ambientLight.intensity = 1;
-                    gamestate.kecepatanWarp = 6; // Ngebut keluar dari kabut
-                    
-                    triggerAI("Evaluasi logika berhasil! Logic Gateway telah memblokir semua paket data anomali. Identitas siluman kita tetap aman. Melompat keluar dari Nebula.", 7000);
-                    setTimeout(() => {
-                        tampilkanMissionSuccess("STATUS: CLEAR. Anda berhasil menjaga kerahasiaan kapal dari deteksi patroli musuh.");
-                    }, 5000);
-                },
-
-                // --- JIKA PEMAIN GAGAL (Salah Analisis SQL) ---
-                () => {
-                    glitchOverlay.classList.add('glitching-active');
-                    sfxGlitch.play(); // Mainkan suara glitch saat gagal bertahan   
-                    setTimeout(() => glitchOverlay.classList.remove('glitching-active'), 2000);
-                    interiorLight.color.setHex(0xff0000); // Merah Darurat!
-                    directionalLight.color.setHex(0xff0000);
-                    directionalLight.intensity = 2;
-                    sfxAlarm.play();
-                    gamestate.isAlarmActive = true;
-                    gamestate.isShaking = true;
-                    
-                    triggerAI("FATAL ERROR! Kesalahan evaluasi kondisi! Malware musuh berhasil mem-bypass Firewall dan mengambil alih sistem propulsi!", 6000);
-
-                    // --- PANGGIL LAYAR GAME OVER (Setelah AI selesai bicara) ---
-                    setTimeout(() => {
-                        tampilkanGameOver("KONEKSI TERPUTUS: Kapal diambil alih oleh peretas tak dikenal akibat kegagalan evaluasi Logic Gateway. Anda lenyap di dalam kegelapan Nebula.");
-                    }, 6000);
-                }
-            );
-
         }, 7000);
 
     }, 6000);
@@ -226,17 +133,7 @@ export function jalankanCeritaAsteroid() {
     
     gamestate.isAlarmActive = false;
     gamestate.isShaking = false; 
-    // ambientLight.color.setHex(0xffffff);
-    // directionalLight.color.setHex(0xffffff);
-    // interiorLight.color.setHex(0x00ffff);
-    // ambientLight.intensity = 1.5;
-    // directionalLight.intensity = 3;
-    // interiorLight.intensity = 5;
 
-    // starMaterial.opacity = 0; 
-    // garisWarpMaterial.opacity = 0.8; 
-
-    // Reset kabut & planet agar bersih
     if(kabutNebula) kabutNebula.density = 0; 
     if(planetGroup) planetGroup.visible = false; 
 
@@ -272,35 +169,6 @@ export function jalankanCeritaAsteroid() {
 
         // Adegan 3: Mulai Minigame (Jeda menunggu AI selesai ngomong)
         setTimeout(() => {
-            
-            mulaiArrayMinigame(
-                // --- JIKA SUKSES MENEBAK 3 INDEKS ---
-                () => {
-                    sfxAlarm.pause();
-                    gamestate.isAlarmActive = false;
-                    gamestate.isShaking = false;
-                    
-                    interiorLight.color.setHex(0x00ffff); // Lampu aman
-                    gamestate.kecepatanWarp = 4; // Lolos dan ngebut
-                    
-                    triggerAI("Manuver luar biasa, Komandan! Pemahaman Anda tentang 'Zero-Based Indexing' telah menyelamatkan lambung kapal kita.", 5000);
-                    setTimeout(() => {
-                        tampilkanMissionSuccess("STATUS: CLEAR. Navigasi array berjalan sempurna. Lambung kapal utuh tanpa goresan.");
-                    }, 5000);
-                },
-
-                // --- JIKA GAGAL / SALAH INDEKS ---
-                () => {
-                    interiorLight.color.setHex(0xff0000); // Merah Darurat!
-                    gamestate.isShaking = true; // Layar makin bergetar
-                    
-                    triggerAI("BENTURAN TERJADI! Lambung kapal terkoyak asteroid! Misi Gagal!", 6000);
-                    setTimeout(() => {
-                        tampilkanGameOver("FATAL ERROR: Index Out of Bounds. Kapal menabrak asteroid raksasa karena kegagalan komputasi array.");
-                    }, 4000);
-                }
-            );
-
         }, 5000);
 
     }, 4000); // Jeda ngebut awal
@@ -308,6 +176,7 @@ export function jalankanCeritaAsteroid() {
     }, 5000)
 }
 
+// --- NASKAH RUTE QUANTUM ---
 // --- NASKAH RUTE QUANTUM ---
 export function jalankanCeritaQuantum() {
     bgm.pause(); 
@@ -331,42 +200,27 @@ export function jalankanCeritaQuantum() {
     interiorLight.color.setHex(0xff00ff); 
     interiorLight.intensity = 4;
 
-    suspenseBgm.play(); // Ganti BGM ke musik yang lebih tegang saat memasuki rute Quantum
+    suspenseBgm.play(); 
 
-    triggerAI("KECEPATAN QUANTUM MAKSIMAL! Peringatan: Sinkronisasi memori inti gagal. Operasi logika biner manual diperlukan untuk menstabilkan reaktor!", 5500);
+    // Narasi diubah karena tidak ada minigame lagi
+    triggerAI("KECEPATAN QUANTUM MAKSIMAL! Menstabilkan reaktor untuk lompatan antar dimensi...", 5500);
 
-    // Adegan 2: Sistem Overload (Jeda menunggu AI selesai bicara)
+    // Adegan 2: Reaktor Stabil & Siap Pindah Game (Jeda 6 detik)
     setTimeout(() => {
+        gamestate.kecepatanWarp = 5; // Kecepatan kembali stabil
+        gamestate.isShaking = false; // Goncangan berhenti
+        interiorLight.color.setHex(0x00ffff); // Lampu biru damai
+        interiorLight.intensity = 2;
+        suspenseBgm.pause(); // Matikan musik tegang
         
-        // Panggil Minigame Bitwise
-        mulaiBitwiseMinigame(
-            // --- JIKA SUKSES (5x Benar) ---
-            () => {
-                gamestate.kecepatanWarp = 5; // Kecepatan kembali stabil
-                gamestate.isShaking = false; // Goncangan berhenti
-                interiorLight.color.setHex(0x00ffff); // Lampu biru damai
-                interiorLight.intensity = 2;
-                suspenseBgm.pause(); // Matikan musik tegang setelah menang
-                
-                triggerAI("Sinkronisasi bitwise berhasil. Reaktor stabil. Kita berhasil menembus dimensi ruang dan waktu, Komandan.", 5000);
-                setTimeout(() => {
-                        tampilkanMissionSuccess("STATUS: CLEAR. Sinkronisasi biner stabil. Anda resmi menembus batas kecepatan cahaya.");
-                    }, 5000);
-            },
-
-            // --- JIKA GAGAL (Salah ketik / Telat) ---
-            () => {
-                interiorLight.color.setHex(0xff0000); // Merah Kritis!
-                gamestate.kecepatanWarp = 50; // Hilang kendali
-                sfxAlarm.play();
-                gamestate.isAlarmActive = true;
-                
-                triggerAI("KERNEL PANIC! Logika biner gagal. Reaktor Quantum meledak!", 6000);
-                setTimeout(() => {
-                    tampilkanGameOver("KERNEL PANIC: Sinkronisasi bitwise gagal. Reaktor Quantum meledak berkeping-keping.");
-                }, 4000);
-            }
-        );
+        triggerAI("Reaktor stabil. Kita berhasil menembus dimensi ruang dan waktu, Komandan. Mempersiapkan pendaratan di Hub World...", 6000);
+        
+        // --- TRANISI KE GAME TEMANMU NANTI ADA DI SINI ---
+        setTimeout(() => {
+            // Kode ini sementara dimatikan dulu sampai link temanmu siap
+            // window.location.href = 'link_game_hub_world_temanmu.html';
+            console.log("Misi Selesai! Pindah ke Hub World...");
+        }, 6000);
 
     }, 6000);
 }
