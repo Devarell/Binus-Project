@@ -27,3 +27,6 @@ sfxVehicleDestroyed.volume = 0.5;
 export const sfxMissionSuccess = new Audio('audio/success_sfx.wav');
 export const sfxMissionFailure = new Audio('audio/gameover_sfx.wav');
 export const sfxGlitch = new Audio('audio/glitch_sfx.wav');
+export const sfxTyping = new Audio('audio/typing_sfx.mp3');
+sfxTyping.loop = true;
+sfxTyping.volume = 0.1;

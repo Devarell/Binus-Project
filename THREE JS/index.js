@@ -75,6 +75,7 @@ loader.load(
 );
 directionalLight.position.set(5, 5, 5);
 interiorLight.position.set(0, 13, 0); // Letakkan di tengah kokpit
+let totalJarak = 0;
 
 // Animasi Render
 function animate() {
@@ -196,7 +197,10 @@ function animate() {
             gridLantai.position.z = 0;
             gridLangit.position.z = 0;
         }
-    }
+    }   
+
+        totalJarak += (gamestate.kecepatanWarp * 0.1);
+        document.getElementById('jarak-tempuh').innerText = Math.floor(totalJarak).toString().padStart(5, '0');
 
     // 1. Simpan posisi asli kamera SAAT INI
     const posisiAsliX = camera.position.x;
@@ -209,6 +213,9 @@ function animate() {
         camera.position.x += (Math.random() - 0.5) * kekuatanGoncangan;
         camera.position.y += (Math.random() - 0.5) * kekuatanGoncangan;
     }
+
+    // camera.fov = 75 + (gamestate.kecepatanWarp * 0.8);
+    // camera.updateProjectionMatrix(); // Efek FOV dinamis saat warp
 
     renderer.render(scene, camera);
 

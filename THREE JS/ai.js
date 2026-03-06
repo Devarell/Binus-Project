@@ -1,3 +1,5 @@
+import {sfxTyping} from './audio.js';   
+
 const aiCompanion = document.getElementById('ai-companion');
 const aiTextElement = document.getElementById('ai-text');
 let typingInterval; 
@@ -24,7 +26,11 @@ export function triggerAI(message, hideAfterMs = 5000, gunakanSuara = true) {
         if (i < message.length) {
             aiTextElement.innerHTML += message.charAt(i);
             i++;
+            // sfxTyping.currentTime = 0;
+            // sfxTyping.play();
         } else {
+            // sfxTyping.pause();
+            // sfxTyping.currentTime = 0;
             clearInterval(typingInterval); 
             if (hideAfterMs > 0) {
                 setTimeout(() => {
