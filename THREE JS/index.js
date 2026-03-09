@@ -8,7 +8,7 @@ import {
     starGeometry, starMaterial, jumlahBintangKartun, starGroup, 
     garisWarpMaterial, garisWarpGeometry, jumlahGaris, garisWarp, 
     planetAlpha, cincinAlpha, planetGroup, kabutNebula, sabukAsteroid,
-    gridGroup, gridLantai, gridLangit
+    gridGroup, gridLantai, gridLangit, bintangRaksasa
 } from './environments.js';
 import { gamestate } from './state.js';
 import './ui.js'; // Pastikan UI diimpor setelah lighting dan environments karena UI memodifikasi state yang digunakan di animasi
@@ -27,6 +27,7 @@ scene.fog = kabutNebula; // Tambahkan efek kabut untuk suasana yang lebih dramat
 scene.add(sabukAsteroid); // Tambahkan sabuk asteroid ke dalam scene
 scene.add(gridGroup); // Tambahkan grup grid untuk efek lorong matriks
 scene.background = new THREE.Color(0x0a0a2a);
+scene.add(bintangRaksasa); // Tambahkan bintang raksasa ke dalam scene
 
 // const axesHelper = new THREE.AxesHelper(50);
 // scene.add(axesHelper);
@@ -229,9 +230,14 @@ function animate() {
             gridLangit.position.z = 0;
         }
     }   
+    // Taruh di dalam function animate()
+    if (bintangRaksasa.visible) {
+        bintangRaksasa.rotation.y += 0.002;
+        bintangRaksasa.rotation.x += 0.001;
+    }
 
-        totalJarak += (gamestate.kecepatanWarp * 0.1);
-        document.getElementById('jarak-tempuh').innerText = Math.floor(totalJarak).toString().padStart(5, '0');
+    totalJarak += (gamestate.kecepatanWarp * 0.1);
+    document.getElementById('jarak-tempuh').innerText = Math.floor(totalJarak).toString().padStart(5, '0');
 
     // 1. Simpan posisi asli kamera SAAT INI
     const posisiAsliX = camera.position.x;

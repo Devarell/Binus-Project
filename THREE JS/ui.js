@@ -5,10 +5,10 @@ import { starMaterial, garisWarpMaterial } from './environments.js';
 import { gamestate } from './state.js';
 import { 
     jalankanIntroSinematik,
-    jalankanCeritaAlpha, 
-    jalankanCeritaNebula, 
-    jalankanCeritaAsteroid, 
-    jalankanCeritaQuantum 
+    jalankanCeritaBensin, 
+    jalankanCeritaBlackhole,
+    jalankanCeritaMesin,
+    jalankanCeritaNavigasi
 } from './story.js';
 
 // Fungsi baru pengganti jalankanVerifikasi
@@ -52,8 +52,8 @@ if (btnStart) {
 }
 
 // --- LOGIKA UI INTERAKTIF (VERSI DATA PULLING LENGKAP) ---
-const statusText = document.getElementById('status-text');
-const uiLayer = document.getElementById('ui-layer');
+// const statusText = document.getElementById('status-text');
+// const uiLayer = document.getElementById('ui-layer');
 
 // --- LOGIKA PEMILIHAN 4 RUTE NAVIGASI ---
 const navButtons = document.querySelectorAll('.nav-btn');
@@ -65,18 +65,18 @@ navButtons.forEach(button => {
         navLayer.style.display = 'none';
         gamestate.isShaking = false; 
         
-        // Panggil buku naskah sesuai tombol yang ditekan!
-        if(pilihanRute === "Alpha") {
-            jalankanCeritaAlpha();
+        // Panggil naskah baru sesuai skenario krisis!
+        if(pilihanRute === "Mesin") {
+            jalankanCeritaMesin();
         } 
-        else if(pilihanRute === "Nebula") {
-            jalankanCeritaNebula();
+        else if(pilihanRute === "Navigasi") {
+            jalankanCeritaNavigasi();
         }
-        else if(pilihanRute === "Asteroid") {
-            jalankanCeritaAsteroid();
+        else if(pilihanRute === "Bensin") {
+            jalankanCeritaBensin();
         }
-        else if(pilihanRute === "Quantum") {
-            jalankanCeritaQuantum();
+        else if(pilihanRute === "Blackhole") {
+            jalankanCeritaBlackhole();
         }
     });
 });

@@ -143,6 +143,16 @@ gridGroup.add(gridLantai);
 gridGroup.add(gridLangit);
 gridGroup.visible = false; 
 
+// ==========================================
+// --- OBJEK LANDMARK: BINTANG RAKSASA ---
+// ==========================================
+// Menggunakan bentuk Icosahedron dengan detail 1 agar terlihat bundar tapi tetap low-poly bersudut
+const raksasaGeometry = new THREE.IcosahedronGeometry(150, 1); 
+const raksasaMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // BasicMaterial agar bersinar tanpa pantulan
+const bintangRaksasa = new THREE.Mesh(raksasaGeometry, raksasaMaterial);
+
+bintangRaksasa.visible = false; // Sembunyikan secara default
+
 
 // --- EXPORT SEMUA YANG DIBUTUHKAN FILE LAIN DI SINI ---
 export {
@@ -161,5 +171,6 @@ export {
     sabukAsteroid,
     gridGroup, 
     gridLantai, 
-    gridLangit
+    gridLangit,
+    bintangRaksasa
 };
