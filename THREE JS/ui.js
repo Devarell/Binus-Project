@@ -4,6 +4,7 @@ import { bgm, sfxAlarm, sfxEngine, sfxExplosion, sfxRingtone, sfxWarp } from './
 import { starMaterial, garisWarpMaterial } from './environments.js';
 import { gamestate } from './state.js';
 import { 
+    jalankanIntroSinematik,
     jalankanCeritaAlpha, 
     jalankanCeritaNebula, 
     jalankanCeritaAsteroid, 
@@ -38,10 +39,16 @@ export function mulaiIntro() {
                 uiLayer.style.display = 'none'; // Hilangkan sepenuhnya
                 
                 // Memicu cerita utama (Pastikan nama fungsi ini sesuai dengan di story.js milikmu)
-                jalankanCeritaAlpha(); // atau jalankanCerita() tergantung nama fungsi lamamu
+                jalankanIntroSinematik(); // atau jalankanCerita() tergantung nama fungsi lamamu
             }, 1000);
         }
     }, 1500);
+}
+
+// --- LOGIKA TOMBOL START BARU ---
+const btnStart = document.getElementById('btn-start-mission');
+if (btnStart) {
+    btnStart.addEventListener('click', mulaiIntro);
 }
 
 // --- LOGIKA UI INTERAKTIF (VERSI DATA PULLING LENGKAP) ---

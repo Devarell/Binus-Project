@@ -6,6 +6,40 @@ import { starMaterial, garisWarpMaterial, planetGroup, kabutNebula, sabukAsteroi
 import { bgm, sfxAlarm, sfxQTEcorrect, sfxQTEwrong, sfxLaser, sfxWarp, sfxVehicleDestroyed, sfxGlitch, suspenseBgm } from './audio.js';
 import { aktifkanRadar, matikanRadar, munculkanMusuh, hilangkanMusuh } from './radar.js';
 
+// --- NASKAH PROLOG (INTRO AWAL) ---
+export function jalankanIntroSinematik() {
+    // 1. Set kondisi penerbangan awal yang santai
+    gamestate.kecepatanWarp = 0.5;
+    gamestate.isShaking = false;
+    ambientLight.color.setHex(0xffffff);
+    directionalLight.color.setHex(0xffffff);
+    interiorLight.color.setHex(0x00ffff);
+    ambientLight.intensity = 1.5;
+    directionalLight.intensity = 3;
+    interiorLight.intensity = 3;
+
+    starMaterial.opacity = 0.8; 
+
+    
+    // 2. Dialog A.I. SYS (Bagian 1)
+    triggerAI("Selamat datang kembali, Komandan. Sistem navigasi utama mengalami anomali. Kita tidak bisa menggunakan rute otomatis menuju Hub World.", 8000);
+    
+    // 3. Dialog A.I. SYS (Bagian 2 - Muncul setelah dialog 1 selesai)
+    setTimeout(() => {
+        triggerAI("Memindai rute manual... Ditemukan 4 jalur potensial. Silakan pilih rute pendekatan Anda melalui panel sistem di layar.", 8000);
+        
+        // 4. Munculkan UI Pilihan Rute (Setelah dialog 2 selesai)
+        setTimeout(() => {
+            const navLayer = document.getElementById('nav-layer');
+            if (navLayer) {
+                // Tampilkan kembali layar pilihan 4 rute (Alpha, Nebula, Asteroid, Quantum)
+                navLayer.style.display = 'flex'; 
+            }
+        }, 8000);
+        
+    }, 8000); // Jeda antar dialog
+}
+
 // --- NASKAH RUTE ALPHA ---
 export function jalankanCeritaAlpha() {
     bgm.pause(); 

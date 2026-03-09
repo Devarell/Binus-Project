@@ -5,18 +5,19 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { triggerAI } from './ai.js';
 import { ambientLight, directionalLight, interiorLight } from './lighting.js';
 import { 
-    starGeometry, starMaterial, jumlahBintang, stars, 
+    starGeometry, starMaterial, jumlahBintangKartun, starGroup, 
     garisWarpMaterial, garisWarpGeometry, jumlahGaris, garisWarp, 
     planetAlpha, cincinAlpha, planetGroup, kabutNebula, sabukAsteroid,
     gridGroup, gridLantai, gridLangit
 } from './environments.js';
 import { gamestate } from './state.js';
 import './ui.js'; // Pastikan UI diimpor setelah lighting dan environments karena UI memodifikasi state yang digunakan di animasi
+import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 16, 0);
-scene.add(stars);
+scene.add(starGroup);
 scene.add(garisWarp);
 scene.add(interiorLight);
 scene.add(ambientLight);
@@ -25,11 +26,19 @@ scene.add(planetGroup);
 scene.fog = kabutNebula; // Tambahkan efek kabut untuk suasana yang lebih dramatis
 scene.add(sabukAsteroid); // Tambahkan sabuk asteroid ke dalam scene
 scene.add(gridGroup); // Tambahkan grup grid untuk efek lorong matriks
+scene.background = new THREE.Color(0x0a0a2a);
 
 // const axesHelper = new THREE.AxesHelper(50);
 // scene.add(axesHelper);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
+// --- EFEK GARIS KARTUN ---
+const effect = new OutlineEffect(renderer, {
+    defaultThickness: 0.008, // Ketebalan garis hitam (Bisa kamu besarkan/kecilkan nanti)
+    defaultColor: [0, 0, 0], // Warna garis (Hitam)
+    defaultAlpha: 1.0,
+    defaultKeepAlive: true   // Menjaga performa roket tetap stabil
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
     
@@ -55,14 +64,44 @@ const loader = new GLTFLoader();
 loader.load(
     'models/scene.gltf', // PENTING: Pastikan nama folder benar-benar diawali huruf kapital 'M'
     function (gltf) {
-        // Jika berhasil, masukkan model ke panggung
-        scene.add(gltf.scene);
+        const cockpit = gltf.scene;
+
+        // --- MULAI OPERASI BEDAH MATERIAL KARTUN (VERSI X-RAY) ---
+        // --- MULAI OPERASI BEDAH MATERIAL KARTUN (FINAL) ---
+        cockpit.traverse((child) => {
+            if (child.isMesh) {
+                const oldMat = child.material;
+                const namaPart = child.name.toLowerCase(); 
+
+                // 1. Ganti semua bagian menjadi material kartun solid
+                child.material = new THREE.MeshLambertMaterial({
+                    color: 0x888888, 
+                    flatShading: true    
+                });
+
+                // 2. TARGET PRESISI: HANCURKAN KACANYA SAJA!
+                // Karena kita pakai kata 'glass', kerangka besi ('canopyframe') akan aman!
+                if (namaPart.includes('glass')) {
+                    child.visible = false; 
+                }
+
+                // 3. Layar monitor neon
+                if (namaPart.includes('screen') || namaPart.includes('monitor') || namaPart.includes('display')) {
+                    child.material = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
+                }
+            }
+        });
+        // --- SELESAI OPERASI BEDAH ---
+
+        // Masukkan model yang sudah "dicuci otak" ke panggung
+        scene.add(cockpit);
         
+
         // KITA KECILKAN SKALANYA SECARA EKSTREM
-        gltf.scene.scale.set(10, 10, 10); // Sesuaikan skala sesuai kebutuhan (misalnya 0.01 untuk sangat kecil)   
-        
+        cockpit.scale.set(10, 10, 10); 
+
         // Posisikan tepat di tengah panggung
-        gltf.scene.position.set(0, 0, 0); 
+        cockpit.position.set(0, 0, 0);
     },
     // Parameter ke-3: onProgress (Jangan dilewatkan!)
     function (xhr) {
@@ -88,30 +127,22 @@ function animate() {
         camera.position.y += (Math.random() - 0.5) * kekuatanGuncangan;
     }
 
-    // --- TAMBAHAN BARU 3: LOGIKA WARP SPEED ---
-    // Ambil daftar koordinat semua bintang
-    const posisiBintang = starGeometry.attributes.position.array;
-    
-    // Looping untuk menggerakkan setiap bintang
-    for(let i = 0; i < jumlahBintang; i++) {
-        // Koordinat Z ada di index (i * 3 + 2) karena urutannya X, Y, Z
-        posisiBintang[i * 3 + 2] -= gamestate.kecepatanWarp; 
-        
-        // Jika bintang sudah melesat melewati belakang kamera (Z > 100)
-        if (posisiBintang[i * 3 + 2] < -100) {
-            // Lempar kembali bintang itu jauh ke depan kaca pesawat
-            posisiBintang[i * 3 + 2] = 100; 
+    starGroup.children.forEach(star => {
+        // Bintang melesat mendekat ke kamera
+        star.position.z -= gamestate.kecepatanWarp;
+
+        // SISTEM DAUR ULANG BINTANG (RESET KE DEPAN)
+        // Jika bintang sudah melewati punggung pilot (Z > 200)
+        if (star.position.z < -200) {
+            // Lempar kembali jauh ke depan (Z negatif besar) agar muncul terus tiada habis
+            star.position.z = 1500; 
+            
+            // Acak ulang X dan Y agar tidak sebaris
+            star.position.x = (Math.random() - 0.5) * 2000;
+            star.position.y = (Math.random() - 0.5) * 2000;
         }
-        if (posisiBintang[i * 3 + 2]  < 7){
-            posisiBintang[i * 3 + 2] = 200;
-        }
-        // posisiBintang[i * 3] = (Math.random() - 0.5) * 200;     // Acak X baru
-        // posisiBintang[i * 3 + 1] = (Math.random() - 0.5) * 200; // Acak Y baru
-    }
-    
-    // PENTING: Beritahu Three.js bahwa koordinat bintang telah berubah
-    starGeometry.attributes.position.needsUpdate = true;
-    
+    });
+
     if (gamestate.isAlarmActive) {
         // Date.now() * 0.005 menentukan seberapa cepat lampu berkedip
         // Math.abs(Math.sin(...)) membuat gelombang angka yang naik turun dari 0 ke 1
@@ -159,7 +190,7 @@ function animate() {
     if (sabukAsteroid.visible) {
         sabukAsteroid.children.forEach(batu => {
             // 1. Batu melesat mendekat
-            batu.position.z += gamestate.kecepatanWarp * 1; 
+            batu.position.z -= gamestate.kecepatanWarp * 1; 
 
             // 2. Batu berputar bebas
             batu.rotation.x += batu.userData.rotSpeedX;
@@ -167,9 +198,9 @@ function animate() {
             batu.rotation.z += batu.userData.rotSpeedZ;
 
             // 3. Efek Daur Ulang (Ilusi Tanpa Batas)
-            if (batu.position.z > 100) {
+            if (batu.position.z < -100) {
                 // LEMPAR KEMBALI JAUH KE DEPAN (MINUS), BUKAN 19!
-                batu.position.z = -200 - (Math.random() * 400); // Semakin minus, semakin jauh munculnya dari depan kaca
+                batu.position.z = 200 - (Math.random() * 400); // Semakin minus, semakin jauh munculnya dari depan kaca
                 
                 // Gunakan Rumus Donat lagi agar saat respawn tidak menabrak lambung/kaca
                 const radiusAman = 80; // Samakan angkanya dengan yang di environments.js
@@ -217,7 +248,7 @@ function animate() {
     // camera.fov = 75 + (gamestate.kecepatanWarp * 0.8);
     // camera.updateProjectionMatrix(); // Efek FOV dinamis saat warp
 
-    renderer.render(scene, camera);
+    effect.render(scene, camera);
 
     if (gamestate.isShaking) {
         camera.position.x = posisiAsliX;
@@ -228,4 +259,4 @@ animate();
 
 // Sapaan awal dari AI (muncul terus sampai login)
 // Tambahkan "false" di belakang agar browser tidak marah
-triggerAI("Halo, Calon Kadet. Tolong masukkan identitas dan manifes akademikmu di layar terminal untuk memulai kalibrasi mesin.", 0, false);
+triggerAI("Halo, Calon Kadet.", 0, false);
