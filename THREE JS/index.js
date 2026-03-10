@@ -86,9 +86,26 @@ loader.load(
                     child.visible = false; 
                 }
 
-                // 3. Layar monitor neon
-                if (namaPart.includes('screen') || namaPart.includes('monitor') || namaPart.includes('display')) {
-                    child.material = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
+                // 3. KENDALI KOKPIT (Hitam Elegan)
+                // Kita tangkap tuas, tombol, dan alas joystick-nya
+                if (namaPart.includes('handle') || namaPart.includes('ball') || namaPart.includes('trigger') || namaPart.includes('button') || namaPart.includes('base')) {
+                    // Gunakan Abu-abu sangat gelap (0x222222) BUKAN hitam pekat (0x000000)
+                    // Agar garis tepi (outline hitam) dari OutlineEffect tetap terlihat!
+                    child.material.color.setHex(0x222222); 
+                }
+
+                // 4. LAYAR & LAMPU PANEL (Neon Green / Hijau Matrix)
+                // Kita tambahkan kata 'emmissive' sesuai data X-Ray sebelumnya
+                if (namaPart.includes('screen') || namaPart.includes('monitor') || namaPart.includes('display') || namaPart.includes('emmissive')) {
+                    child.material = new THREE.MeshBasicMaterial({ 
+                        color: 0x39ff14 // Kode warna khusus untuk Neon Green yang menyala
+                    });
+                }
+                
+                // (OPSIONAL) 5. KURSI PILOT
+                // Jika Komandan ingin kursinya juga gelap agar kontras
+                if (namaPart.includes('seat') || namaPart.includes('back') || namaPart.includes('headrest') || namaPart.includes('armrest')) {
+                    child.material.color.setHex(0x444444); // Abu-abu tua
                 }
             }
         });
