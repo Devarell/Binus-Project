@@ -2,7 +2,7 @@
 import { triggerAI } from './ai.js';
 import { gamestate } from './state.js';
 import { ambientLight, directionalLight, interiorLight } from './lighting.js';
-import { starMaterial, garisWarpMaterial, planetGroup, kabutNebula, sabukAsteroid, gridGroup, bintangRaksasa} from './environments.js';
+import { starMaterial, garisWarpMaterial, planetGroup, kabutNebula, sabukAsteroid, gridGroup, bintangRaksasa, asteroidRaksasa} from './environments.js';
 import { bgm, sfxAlarm, sfxQTEcorrect, sfxQTEwrong, sfxLaser, sfxWarp, sfxVehicleDestroyed, sfxGlitch, suspenseBgm } from './audio.js';
 //import { aktifkanRadar, matikanRadar, munculkanMusuh, hilangkanMusuh } from './radar.js';
 
@@ -49,14 +49,19 @@ function adeganTabrakanAsteroid() {
         interiorLight.color.setHex(0xff0000); // Lampu merah bahaya
         interiorLight.intensity = 4;
         gamestate.isShaking = true; // Kokpit bergetar hebat
+        setTimeout(() => {
+            asteroidRaksasa.visible = true;
+            asteroidRaksasa.position.set(150, 120, 800); 
+        }, 6000);
 
-        triggerAI("PERINGATAN KRITIS! Anomali gravitasi menarik serpihan asteroid raksasa ke arah kita! Benturan tak terhindarkan dalam 3... 2... 1...", 6000);
+        triggerAI("PERINGATAN KRITIS! Objek masif terdeteksi mendekat dengan kecepatan tinggi! Benturan tak terhindarkan dalam 3... 2... 1...", 6000);
 
         setTimeout(() => {
             // Layar berubah menjadi putih terang karena tabrakan
             const flashOverlay = document.getElementById('flash-overlay');
             if(flashOverlay) {
-                flashOverlay.style.background = 'white';
+                flashOverlay.style.background = 'ff0000';
+                flashOverlay.style.transition = 'opacity 1s ease-in';
                 flashOverlay.style.opacity = 1;
             }
             

@@ -153,6 +153,18 @@ const bintangRaksasa = new THREE.Mesh(raksasaGeometry, raksasaMaterial);
 
 bintangRaksasa.visible = false; // Sembunyikan secara default
 
+// ==========================================
+// --- OBJEK MAUT: ASTEROID RAKSASA (ENDING) ---
+// ==========================================
+const asteroidRaksasaGeometry = new THREE.DodecahedronGeometry(80, 0); // Ukuran raksasa
+const asteroidRaksasaMaterial = new THREE.MeshLambertMaterial({
+    color: 0x4a3c31, // Cokelat gelap kusam ala meteor
+    flatShading: true // Tetap kotak-kotak (Low Poly)
+});
+const asteroidRaksasa = new THREE.Mesh(asteroidRaksasaGeometry, asteroidRaksasaMaterial);
+
+asteroidRaksasa.visible = false; // Sembunyikan sampai akhir cerita!
+
 
 // --- EXPORT SEMUA YANG DIBUTUHKAN FILE LAIN DI SINI ---
 export {
@@ -172,5 +184,6 @@ export {
     gridGroup, 
     gridLantai, 
     gridLangit,
-    bintangRaksasa
+    bintangRaksasa,
+    asteroidRaksasa
 };

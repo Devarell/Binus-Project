@@ -8,7 +8,7 @@ import {
     starGeometry, starMaterial, jumlahBintangKartun, starGroup, 
     garisWarpMaterial, garisWarpGeometry, jumlahGaris, garisWarp, 
     planetAlpha, cincinAlpha, planetGroup, kabutNebula, sabukAsteroid,
-    gridGroup, gridLantai, gridLangit, bintangRaksasa
+    gridGroup, gridLantai, gridLangit, bintangRaksasa, asteroidRaksasa
 } from './environments.js';
 import { gamestate } from './state.js';
 import './ui.js'; // Pastikan UI diimpor setelah lighting dan environments karena UI memodifikasi state yang digunakan di animasi
@@ -28,6 +28,7 @@ scene.add(sabukAsteroid); // Tambahkan sabuk asteroid ke dalam scene
 scene.add(gridGroup); // Tambahkan grup grid untuk efek lorong matriks
 scene.background = new THREE.Color(0x0a0a2a);
 scene.add(bintangRaksasa); // Tambahkan bintang raksasa ke dalam scene
+scene.add(asteroidRaksasa); // Tambahkan asteroid raksasa ke dalam scene
 
 // const axesHelper = new THREE.AxesHelper(50);
 // scene.add(axesHelper);
@@ -194,64 +195,23 @@ function animate() {
         }
         garisWarpGeometry.attributes.position.needsUpdate = true;
     }
-
-    // --- ANIMASI PLANET ALPHA ---
-    if (planetGroup.visible) {
-        planetAlpha.rotation.y += 0.002; // Putar badan planet
-        cincinAlpha.rotation.z -= 0.001; // Putar cincinnya berlawanan arah
-        
-        // Buat planet perlahan-lahan mendekat ke arah kita (Z bertambah)
-        planetGroup.position.z += gamestate.kecepatanWarp * 0.2; 
-    }
-
-    // --- ANIMASI SABUK ASTEROID ---
-    if (sabukAsteroid.visible) {
-        sabukAsteroid.children.forEach(batu => {
-            // 1. Batu melesat mendekat
-            batu.position.z -= gamestate.kecepatanWarp * 1; 
-
-            // 2. Batu berputar bebas
-            batu.rotation.x += batu.userData.rotSpeedX;
-            batu.rotation.y += batu.userData.rotSpeedY;
-            batu.rotation.z += batu.userData.rotSpeedZ;
-
-            // 3. Efek Daur Ulang (Ilusi Tanpa Batas)
-            if (batu.position.z < -100) {
-                // LEMPAR KEMBALI JAUH KE DEPAN (MINUS), BUKAN 19!
-                batu.position.z = 200 - (Math.random() * 400); // Semakin minus, semakin jauh munculnya dari depan kaca
-                
-                // Gunakan Rumus Donat lagi agar saat respawn tidak menabrak lambung/kaca
-                const radiusAman = 80; // Samakan angkanya dengan yang di environments.js
-                const radiusMaksimal = 350;
-                const radius = radiusAman + Math.random() * (radiusMaksimal - radiusAman);
-                const sudut = Math.random() * Math.PI * 2;
-
-                batu.position.x = Math.cos(sudut) * radius;
-                batu.position.y = Math.sin(sudut) * radius;
-            }
-        });
-    }
-
-    // --- ANIMASI LORONG MATRIKS QUANTUM ---
-    if (gridGroup.visible) {
-        // Lantai melesat ke arah kamera (dikali 3 agar lebih gila dari asteroid!)
-        const kecepatanMatrix = gamestate.kecepatanWarp * 3;
-        gridLantai.position.z += kecepatanMatrix;
-        gridLangit.position.z += kecepatanMatrix;
-
-        // EFEK ILUSI TANPA BATAS (Treadmill Matrix)
-        // Jarak antar garis kotak adalah: ukuranGrid / jumlahKotak = 2000 / 100 = 20 unit.
-        // Jika lantai sudah melaju sejauh 20 unit, kembalikan ke titik 0 secara instan!
-        if (gridLantai.position.z > 20) {
-            gridLantai.position.z = 0;
-            gridLangit.position.z = 0;
-        }
-    }   
+    
     // Taruh di dalam function animate()
     if (bintangRaksasa.visible) {
         bintangRaksasa.rotation.y += 0.002;
         bintangRaksasa.rotation.x += 0.001;
     }
+    // Taruh di dalam function animate()
+    if (asteroidRaksasa.visible) {
+     // Bergerak cepat bagaikan peluru dari Serong Kanan Atas ke Kokpit (0,0,0)
+    asteroidRaksasa.position.x -= 1.5;  // Bergeser ke kiri
+    asteroidRaksasa.position.y -= 1.2;  // Bergeser ke bawah
+    asteroidRaksasa.position.z -= 8.0;  // Mendekat ke kaca depan dengan sangat cepat!
+
+     // Efek putaran batu yang mengerikan
+    asteroidRaksasa.rotation.x -= 0.02;
+    asteroidRaksasa.rotation.y += 0.03;
+}
 
     totalJarak += (gamestate.kecepatanWarp * 0.1);
     document.getElementById('jarak-tempuh').innerText = Math.floor(totalJarak).toString().padStart(5, '0');
